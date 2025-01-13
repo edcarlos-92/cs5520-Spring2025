@@ -7,28 +7,10 @@ import Input from './components/Input';
 export default function App() {
 
   const appName = "My first awesome mobile app";
-  const appHeaderText = "This is my app header";
-
-  // const [inputText, setInputText] = useState('');
 
   return (
     <View style={styles.container}>
       <Text>Welcome to {appName}</Text>
-      <Header appHeaderText={appHeaderText} />
-
-      <Input />
-
-      {/* <TextInput
-        style={styles.input}
-        value={inputText}
-        onChangeText={setInputText}
-        placeholder="Enter some text..."
-      />
-
-      <Text style={styles.displayText}>
-        You entered: {inputText}
-      </Text> */}
-
       <StatusBar style="auto" />
     </View>
   );
