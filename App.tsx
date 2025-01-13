@@ -7,10 +7,12 @@ import Input from './components/Input';
 export default function App() {
 
   const appName = "My first awesome mobile app";
+  const appHeaderText = "This is my app header";
 
   return (
     <View style={styles.container}>
       <Text>Welcome to {appName}</Text>
+      <Header appHeaderText={appHeaderText} />
       <StatusBar style="auto" />
     </View>
   );

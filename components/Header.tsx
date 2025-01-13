@@ -1,9 +1,11 @@
 import React from 'react'
 import { View, Text } from 'react-native'
 
-export default function Header(props: any) {
+interface HeaderProps {
+    appHeaderText: string;
+}
 
-    // const appHeaderText = "My App Header";
+export default function Header(props: HeaderProps) {
 
     return (
         <View>
