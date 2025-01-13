@@ -13,7 +13,6 @@ const Input = () => {
                 value={inputText}
                 placeholder="Enter text here"
             />
-
             <Text style={styles.displayText}>
                 You entered: {inputText}
             </Text>
