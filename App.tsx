@@ -13,6 +13,7 @@ export default function App() {
     <View style={styles.container}>
       <Text>Welcome to {appName}</Text>
       <Header appHeaderText={appHeaderText} />
+      <Input />
       <StatusBar style="auto" />
     </View>
   );
