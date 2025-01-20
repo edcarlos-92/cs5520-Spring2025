@@ -9,7 +9,7 @@ export default function Header(props: HeaderProps) {
 
     return (
         <View>
-            <Text>{props.appHeaderText}</Text>
+            <Text>{`Welcome to ${props.appHeaderText}`}</Text>
         </View>
     )
 }
