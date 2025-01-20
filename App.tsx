@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import Header from '@/components/Header';
 import Input from '@/components/Input';
 import { useState } from 'react';
@@ -18,25 +18,43 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <Header appHeaderText={appName} />
 
-      <Button
-        title="Add a goal"
-        onPress={() => setIsModalVisible(true)}
-      />
+    <SafeAreaView style={styles.safeArea}>
 
-      <Input
-        autoFocusInput={true}
-        inputHandler={handleInputData}
-        visible={isModalVisible}
+      <View style={styles.container}>
 
-      />
-      <Text >
-        Submitted text: {submittedText}
-      </Text>
-      <StatusBar style="auto" />
-    </View>
+
+        <View style={styles.headerSection}>
+          <Header appHeaderText={appName} />
+        </View>
+
+        <View style={styles.buttonSection}>
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Add a goal"
+              onPress={() => setIsModalVisible(true)}
+            />
+          </View>
+        </View>
+
+        <View style={styles.resultsSection}>
+          <Text style={styles.submittedText}>
+            Submitted goal: {submittedText}
+          </Text>
+        </View>
+
+        <Input
+          autoFocusInput={true}
+          inputHandler={handleInputData}
+          visible={isModalVisible}
+        />
+
+        <StatusBar style="auto" />
+      </View>
+
+    </SafeAreaView>
+
+
   );
 }
 
@@ -44,7 +62,60 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'center',
   },
+
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+
+  headerSection: {
+    flex: 1, // Takes 1/5
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  buttonSection: {
+    flex: 1, // Takes 1/5
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  resultsSection: {
+    flex: 3, // Takes 3/5
+    backgroundColor: '#fae7e6',
+    width: '100%',
+    alignItems: 'center',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    width: '30%',
+  },
+  submittedText: {
+    fontSize: 16,
+    color: '#666',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    width: '90%',
+    textAlign: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+
 });
