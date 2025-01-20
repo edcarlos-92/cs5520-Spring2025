@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Text, Button } from 'react-native';
+import { StyleSheet, View, TextInput, Text, Button, Modal } from 'react-native';
 
 
 // Define the props interface
 interface InputProps {
     autoFocusInput?: boolean;
     inputHandler: (text: string) => void;
+    visible: boolean;
 }
 
 
-const Input = ({ autoFocusInput = false, inputHandler }: InputProps) => {
+const Input = ({ autoFocusInput = false, inputHandler, visible }: InputProps) => {
     const [inputText, setInputText] = useState('');
     const [isFocused, setIsFocused] = useState(autoFocusInput);
     const [hasBlurred, setHasBlurred] = useState(false);
@@ -29,49 +30,61 @@ const Input = ({ autoFocusInput = false, inputHandler }: InputProps) => {
     const handleConfirm = () => {
         console.log('User entered:', inputText);
         inputHandler(inputText);
+        setInputText(''); // Clear input after submission
     };
 
 
-
-
     return (
-        <View style={styles.container}>
 
-            <TextInput
-                style={styles.input}
-                onChangeText={newText => setInputText(newText)}
-                value={inputText}
-                placeholder="Enter text here"
-                autoFocus={autoFocusInput}
-                onBlur={handleBlur}
-                onFocus={handleFocus}
-            />
+        <Modal
 
-            {/* Character count - only show when focused and text exists */}
-            {isFocused && inputText.length > 0 && (
-                <Text style={styles.countText}>
-                    Characters: {inputText.length}
-                </Text>
-            )}
+            visible={visible}
+            animationType="slide"
+        >
 
-            {/* Feedback message - only show after blur ie. When user presses Enter/Done */}
-            {hasBlurred && !isFocused && (
-                <Text style={[
-                    styles.feedbackText,
-                    inputText.length >= 3 ? styles.successText : styles.errorText
-                ]}>
-                    {inputText.length >= 3
-                        ? "Thank you"
-                        : "Please type more than 3 characters"}
-                </Text>
-            )}
+            <View style={styles.container}>
 
-            <Button
-                title="Confirm"
-                onPress={handleConfirm}
-            />
+                <TextInput
+                    style={styles.input}
+                    onChangeText={newText => setInputText(newText)}
+                    value={inputText}
+                    placeholder="Enter text here"
+                    autoFocus={autoFocusInput}
+                    onBlur={handleBlur}
+                    onFocus={handleFocus}
+                />
 
-        </View>
+                {/* Character count - only show when focused and text exists */}
+                {isFocused && inputText.length > 0 && (
+                    <Text style={styles.countText}>
+                        Characters: {inputText.length}
+                    </Text>
+                )}
+
+                {/* Feedback message - only show after blur ie. When user presses Enter/Done */}
+                {hasBlurred && !isFocused && (
+                    <Text style={[
+                        styles.feedbackText,
+                        inputText.length >= 3 ? styles.successText : styles.errorText
+                    ]}>
+                        {inputText.length >= 3
+                            ? "Thank you"
+                            : "Please type more than 3 characters"}
+                    </Text>
+                )}
+
+                <Button
+                    title="Confirm"
+                    onPress={handleConfirm}
+                />
+
+            </View>
+
+
+        </Modal>
+
+
+
     );
 };
 
