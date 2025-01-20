@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, Text, Button } from 'react-native';
 
+
+// Define the props interface
 interface InputProps {
     autoFocusInput?: boolean;
+    inputHandler: (text: string) => void;
 }
 
-const Input = ({ autoFocusInput = false }: InputProps) => {
+
+const Input = ({ autoFocusInput = false, inputHandler }: InputProps) => {
     const [inputText, setInputText] = useState('');
     const [isFocused, setIsFocused] = useState(autoFocusInput);
     const [hasBlurred, setHasBlurred] = useState(false);
@@ -24,7 +28,10 @@ const Input = ({ autoFocusInput = false }: InputProps) => {
     // Event handler function for the Confirm button
     const handleConfirm = () => {
         console.log('User entered:', inputText);
+        inputHandler(inputText);
     };
+
+
 
 
     return (
