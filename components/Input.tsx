@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, Text } from 'react-native';
+import { StyleSheet, View, TextInput, Text, Button } from 'react-native';
 
 interface InputProps {
     autoFocusInput?: boolean;
@@ -19,6 +19,13 @@ const Input = ({ autoFocusInput = false }: InputProps) => {
         setIsFocused(true);
         setHasBlurred(false);
     };
+
+
+    // Event handler function for the Confirm button
+    const handleConfirm = () => {
+        console.log('User entered:', inputText);
+    };
+
 
     return (
         <View style={styles.container}>
@@ -51,6 +58,11 @@ const Input = ({ autoFocusInput = false }: InputProps) => {
                         : "Please type more than 3 characters"}
                 </Text>
             )}
+
+            <Button
+                title="Confirm"
+                onPress={handleConfirm}
+            />
 
         </View>
     );
