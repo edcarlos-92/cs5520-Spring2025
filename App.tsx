@@ -5,24 +5,22 @@ import Input from '@/components/Input';
 import { useState } from 'react';
 
 export default function App() {
-  const appName = "My awesome app";
-
-  // State to store the input data
+  const appName = "my awesome app";
   const [submittedText, setSubmittedText] = useState<string>('');
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Callback function to receive data from Input component
   const handleInputData = (text: string) => {
     setSubmittedText(text);
-    setIsModalVisible(false); // Hide modal after submission
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
   };
 
   return (
-
     <SafeAreaView style={styles.safeArea}>
-
       <View style={styles.container}>
-
 
         <View style={styles.headerSection}>
           <Header appHeaderText={appName} />
@@ -46,15 +44,13 @@ export default function App() {
         <Input
           autoFocusInput={true}
           inputHandler={handleInputData}
+          onCancel={handleCancel}
           visible={isModalVisible}
         />
 
         <StatusBar style="auto" />
       </View>
-
     </SafeAreaView>
-
-
   );
 }
 
@@ -76,7 +72,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 16,
+    borderRadius: 20,
+    color: '#000',
+    borderColor: '#000',
   },
+
   buttonSection: {
     flex: 1, // Takes 1/5
     justifyContent: 'center',
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '90%',
     textAlign: 'center',
-    elevation: 2,
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
