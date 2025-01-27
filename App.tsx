@@ -4,14 +4,30 @@ import Header from '@/components/Header';
 import Input from '@/components/Input';
 import { useState } from 'react';
 
+
+export interface Goal {
+  text: string;
+  id: number;
+}
+
 export default function App() {
   const appName = "my awesome app";
   const [submittedText, setSubmittedText] = useState<string>('');
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const [goals, setGoals] = useState<Goal[]>([]);
+
   const handleInputData = (text: string) => {
-    setSubmittedText(text);
+    // setSubmittedText(text);
     setIsModalVisible(false);
+
+    let newGoal: Goal = {
+      text: text,
+      id: Math.random()
+    };
+    setGoals(prevGoals => [...prevGoals, newGoal]);
+
+
   };
 
   const handleCancel = () => {
@@ -36,9 +52,7 @@ export default function App() {
         </View>
 
         <View style={styles.resultsSection}>
-          <Text style={styles.submittedText}>
-            Submitted goal: {submittedText}
-          </Text>
+          {submittedText && <Text style={styles.submittedText}></Text>}
         </View>
 
         <Input
