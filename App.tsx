@@ -12,7 +12,7 @@ export interface Goal {
 
 export default function App() {
   const appName = "my awesome app";
-  const [submittedText, setSubmittedText] = useState<string>('');
+  // const [submittedText, setSubmittedText] = useState<string>('');
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -51,9 +51,20 @@ export default function App() {
           </View>
         </View>
 
-        <View style={styles.resultsSection}>
+        {/* <View style={styles.resultsSection}>
           {submittedText && <Text style={styles.submittedText}></Text>}
+        </View> */}
+
+
+        <View style={styles.resultsSection}>
+          {goals.map((goalObj) => (
+            <View key={goalObj.id}>
+              {goalObj.text && <Text style={styles.submittedText}>{goalObj.text}</Text>}
+            </View>
+          ))}
         </View>
+
+
 
         <Input
           autoFocusInput={true}
