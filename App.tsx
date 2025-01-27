@@ -3,6 +3,7 @@ import { Button, FlatList, SafeAreaView, ScrollView, StyleSheet, Text, View } fr
 import Header from '@/components/Header';
 import Input from '@/components/Input';
 import { useState } from 'react';
+import GoalItem from '@/components/GoalItem';
 
 
 export interface Goal {
@@ -12,13 +13,13 @@ export interface Goal {
 
 export default function App() {
   const appName = "my awesome app";
-  // const [submittedText, setSubmittedText] = useState<string>('');
+  // const [submittedGoal, setSubmittedGoal] = useState<string>('');
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [goals, setGoals] = useState<Goal[]>([]);
 
   const handleInputData = (text: string) => {
-    // setSubmittedText(text);
+    // setSubmittedGoal(text);
     setIsModalVisible(false);
 
     let newGoal: Goal = {
@@ -52,14 +53,14 @@ export default function App() {
         </View>
 
         {/* <View style={styles.resultsSection}>
-          {submittedText && <Text style={styles.submittedText}></Text>}
+          {submittedGoal && <Text style={styles.submittedGoal}></Text>}
         </View> */}
 
 
         {/* <View style={styles.resultsSection}>
           {goals.map((goalObj) => (
             <View key={goalObj.id}>
-              {goalObj.text && <Text style={styles.submittedText}>{goalObj.text}</Text>}
+              {goalObj.text && <Text style={styles.submittedGoal}>{goalObj.text}</Text>}
             </View>
           ))}
         </View> */}
@@ -68,10 +69,24 @@ export default function App() {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             {goals.map((goalObj) => (
               <View key={goalObj.id}>
-                {goalObj.text && <Text style={styles.submittedText}>{goalObj.text}</Text>}
+                {goalObj.text && <Text style={styles.submittedGoal}>{goalObj.text}</Text>}
               </View>
             ))}
           </ScrollView>
+        </View> */}
+
+
+
+        {/* <View style={styles.listResultSection}>
+          <FlatList
+            data={goals}
+            contentContainerStyle={styles.flatListView}
+            renderItem={({ item }) => (
+              <View>
+                <Text style={styles.submittedGoal}>{item.text}</Text>
+              </View>
+            )}
+          />
         </View> */}
 
 
@@ -80,13 +95,10 @@ export default function App() {
           <FlatList
             data={goals}
             contentContainerStyle={styles.flatListView}
-            renderItem={({ item }) => (
-              <View>
-                <Text style={styles.submittedText}>{item.text}</Text>
-              </View>
-            )}
+            renderItem={({ item }) => <GoalItem goal={item} />}
           />
         </View>
+
 
 
         <Input
@@ -148,10 +160,10 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '30%',
   },
-  submittedText: {
+  submittedGoal: {
     fontSize: 16,
     color: '#666',
-    backgroundColor: '#fff',
+    backgroundColor: '#f1f2b1',
 
     borderRadius: 8,
     width: '90%',
