@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Button, FlatList, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Header from '@/components/Header';
 import Input from '@/components/Input';
 import { useState } from 'react';
@@ -56,14 +56,37 @@ export default function App() {
         </View> */}
 
 
-        <View style={styles.resultsSection}>
+        {/* <View style={styles.resultsSection}>
           {goals.map((goalObj) => (
             <View key={goalObj.id}>
               {goalObj.text && <Text style={styles.submittedText}>{goalObj.text}</Text>}
             </View>
           ))}
-        </View>
+        </View> */}
 
+        {/* <View style={styles.listResultSection}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            {goals.map((goalObj) => (
+              <View key={goalObj.id}>
+                {goalObj.text && <Text style={styles.submittedText}>{goalObj.text}</Text>}
+              </View>
+            ))}
+          </ScrollView>
+        </View> */}
+
+
+
+        <View style={styles.listResultSection}>
+          <FlatList
+            data={goals}
+            contentContainerStyle={styles.flatListView}
+            renderItem={({ item }) => (
+              <View>
+                <Text style={styles.submittedText}>{item.text}</Text>
+              </View>
+            )}
+          />
+        </View>
 
 
         <Input
@@ -129,7 +152,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     backgroundColor: '#fff',
-    padding: 16,
+
     borderRadius: 8,
     width: '90%',
     textAlign: 'center',
@@ -141,6 +164,32 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 2,
+    padding: 16,
+    marginBottom: 10
+    // marginTop: 50
+  },
+
+  listResultSection: {
+    flex: 3, // Takes 3/5
+    backgroundColor: '#fae7e6',
+    width: '100%',
+    // alignItems: 'center',
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+
+  scrollContent: {
+    alignItems: 'center',
+    // padding: 20,
+    // width: '100%'
+  },
+
+  flatListView: {
+    // marginLeft: 'auto',
+    // marginRight: 'auto',
+    alignItems: 'center',
+    // width: '50%'
   },
 
 });
