@@ -1,41 +1,48 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import { Goal } from '@/App';
-
 
 interface GoalItemProps {
     goal: Goal;
+    onDelete: (id: number) => void;
 }
 
-
-const GoalItem = ({ goal }: GoalItemProps) => {
+const GoalItem = ({ goal, onDelete }: GoalItemProps) => {
     return (
-        <View>
-            {goal && <Text style={styles.submittedGoal}>{goal.text}</Text>}
+        <View style={styles.goalContainer}>
+            <Text style={styles.submittedGoal}>{goal.text}</Text>
+            <View style={styles.deleteButton}>
+                <Button
+                    title="X"
+                    onPress={() => onDelete(goal.id)}
+                    color="gray"
+                />
+            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    goalContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#f1f2b1',
+        borderRadius: 8,
+        width: '90%',
+        marginTop: 8,
+        alignSelf: 'center',
+        overflow: 'hidden'
+    },
     submittedGoal: {
         fontSize: 16,
         color: '#666',
-        // backgroundColor: '#fff',
-        backgroundColor: '#f1f2b1',
         padding: 16,
-        borderRadius: 8,
-        width: '90%',
-        textAlign: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-        marginTop: 8
-
+        flex: 1,
+        textAlign: 'center'
     },
+    deleteButton: {
+        backgroundColor: 'gray',
+        justifyContent: 'center',
+        width: 50
+    }
 });
 
 export default GoalItem;
