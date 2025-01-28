@@ -24,18 +24,17 @@ const GoalItem = ({ goal, onDelete }: GoalItemProps) => {
 const styles = StyleSheet.create({
     goalContainer: {
         flexDirection: 'row',
-        backgroundColor: '#f1f2b1',
+        backgroundColor: '#d7d9d7',
         borderRadius: 8,
-        width: '90%',
+        width: 'auto',
         marginTop: 8,
         alignSelf: 'center',
         overflow: 'hidden'
     },
     submittedGoal: {
         fontSize: 16,
-        color: '#666',
+        color: 'purple',
         padding: 16,
-        flex: 1,
         textAlign: 'center'
     },
     deleteButton: {
