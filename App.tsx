@@ -1,121 +1,112 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Button, FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
 import Header from '@/components/Header';
 import Input from '@/components/Input';
 import { useState } from 'react';
+import GoalItem from '@/components/GoalItem';
+
+export interface Goal {
+  text: string;
+  id: number;
+}
 
 export default function App() {
-  const appName = "My awesome app";
-
-  // State to store the input data
-  const [submittedText, setSubmittedText] = useState<string>('');
+  const appName = "my awesome app";
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [goals, setGoals] = useState<Goal[]>([]);
 
-  // Callback function to receive data from Input component
   const handleInputData = (text: string) => {
-    setSubmittedText(text);
-    setIsModalVisible(false); // Hide modal after submission
+    setIsModalVisible(false);
+    let newGoal: Goal = {
+      text: text,
+      id: Math.random()
+    };
+    setGoals(prevGoals => [...prevGoals, newGoal]);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleDeleteGoal = (deletedId: number) => {
+    setGoals(prevGoals => prevGoals.filter(goal => goal.id !== deletedId));
   };
 
   return (
-
     <SafeAreaView style={styles.safeArea}>
-
       <View style={styles.container}>
+        <View style={styles.topSection}>
 
 
-        <View style={styles.headerSection}>
-          <Header appHeaderText={appName} />
-        </View>
+          <View style={styles.headerSection}>
+            <Header appHeaderText={appName} />
+          </View>
 
-        <View style={styles.buttonSection}>
-          <View style={styles.buttonContainer}>
-            <Button
-              title="Add a goal"
-              onPress={() => setIsModalVisible(true)}
-            />
+          <View style={styles.buttonSection}>
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Add a goal"
+                onPress={() => setIsModalVisible(true)}
+              />
+            </View>
           </View>
         </View>
 
-        <View style={styles.resultsSection}>
-          <Text style={styles.submittedText}>
-            Submitted goal: {submittedText}
-          </Text>
+        <View style={styles.listSection}>
+          <FlatList
+            data={goals}
+            contentContainerStyle={styles.flatListContent}
+            renderItem={({ item }) => <GoalItem goal={item} onDelete={handleDeleteGoal} />}
+          />
         </View>
 
         <Input
           autoFocusInput={true}
           inputHandler={handleInputData}
+          onCancel={handleCancel}
           visible={isModalVisible}
         />
 
         <StatusBar style="auto" />
       </View>
-
     </SafeAreaView>
-
-
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    // alignItems: 'center',
-    justifyContent: 'center',
-  },
-
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
   },
-
-  headerSection: {
-    flex: 1, // Takes 1/5
-    justifyContent: 'center',
-    alignItems: 'center',
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  topSection: {
     paddingVertical: 16,
   },
-  buttonSection: {
-    flex: 1, // Takes 1/5
+  headerSection: {
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 8,
+    marginTop: 40
   },
-  resultsSection: {
-    flex: 3, // Takes 3/5
-    backgroundColor: '#fae7e6',
-    width: '100%',
+  buttonSection: {
     alignItems: 'center',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
+    marginBottom: 10,
+    marginTop: 10
   },
   buttonContainer: {
     width: '30%',
   },
-  submittedText: {
-    fontSize: 16,
-    color: '#666',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    width: '90%',
-    textAlign: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+  listSection: {
+    flex: 1,
+    backgroundColor: '#fae7e6',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
   },
-
+  flatListContent: {
+    alignItems: 'center',
+  },
 });
