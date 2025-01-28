@@ -17,7 +17,7 @@ export default function Header(props: HeaderProps) {
 const styles = StyleSheet.create({
     headerContainer: {
         borderWidth: 2,
-        borderColor: '#2196F3',
+        borderColor: 'purple',
         borderRadius: 10,
         backgroundColor: '#F5F5F5',
         paddingHorizontal: 20,
