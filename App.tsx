@@ -2,38 +2,77 @@ import { StatusBar } from 'expo-status-bar';
 import { Button, FlatList, SafeAreaView, StyleSheet, View, Text, Alert } from 'react-native';
 import Header from '@/components/Header';
 import Input from '@/components/Input';
-import { useState } from 'react';
-import GoalItem from '@/components/GoalItem';
-import { app } from '@/Firebase/firebaseSetup';
+import { useState, useEffect } from 'react';
+import GoalItem from '@/playground/week5/p/Activity - Delete data from Firestore /GoalItem';
+import { deleteFromDB, writeToDB } from '@/Firebase/firestoreHelper';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { database } from '@/Firebase/firebaseSetup';
 
-export interface Goal {
+export interface GoalFromDB {
   text: string;
-  id: number;
+  id: string;
 }
-
 export default function App() {
-
-  // console.log(app);
-
   const appName = "my awesome app";
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [goals, setGoals] = useState<Goal[]>([]);
+  const [goals, setGoals] = useState<GoalFromDB[]>([]);
 
-  const handleInputData = (text: string) => {
-    setIsModalVisible(false);
-    let newGoal: Goal = {
-      text: text,
-      id: Math.random()
+  useEffect(() => {
+    console.log('Setting up Firestore listener...');
+
+    const unsubscribe = onSnapshot(collection(database, "goals"), (querySnapshot) => {
+      if (!querySnapshot.empty) {
+        const goalsData: GoalFromDB[] = [];
+        querySnapshot.forEach((doc) => {
+          goalsData.push({
+            ...doc.data(),        // spread the document data or ...doc.data() as GoalFromDB,
+            id: doc.id            // add the document ID
+          } as GoalFromDB);
+        });
+        setGoals(goalsData);
+      } else {
+        setGoals([]);
+      }
+    });
+
+    // Cleanup function that runs when component unmounts
+    return () => {
+      console.log('Detaching Firestore listener...');
+      unsubscribe();
     };
-    setGoals(prevGoals => [...prevGoals, newGoal]);
+  }, []);
+
+
+  const handleInputData = async (text: string) => {
+    setIsModalVisible(false);
+    const GoalFromDB = {
+      text: text
+    };
+
+    try {
+      await writeToDB(GoalFromDB, "goals");
+      // Removed manual state update since onSnapshot handles it
+    } catch (error) {
+      console.error("Error writing goal to database: ", error);
+    }
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
-  const handleDeleteGoal = (deletedId: number) => {
-    setGoals(prevGoals => prevGoals.filter(goal => goal.id !== deletedId));
+  // const handleDeleteGoal = (deletedId: string) => {
+  //   setGoals(prevGoals => prevGoals.filter(goal => goal.id !== deletedId));
+  // };
+
+  const handleDeleteGoal = async (deletedId: string) => {
+    try {
+      await deleteFromDB(deletedId, "goals");
+      // No need to manually update state as onSnapshot will handle it
+    } catch (error) {
+      console.error("Error deleting goal from database: ", error);
+      Alert.alert("Error", "Failed to delete goal. Please try again.");
+    }
   };
 
   const handleDeleteAll = () => {
@@ -47,11 +86,20 @@ export default function App() {
         },
         {
           text: "Yes",
-          onPress: () => setGoals([])
+          onPress: async () => {
+            try {
+              // await deleteAllFromDB("goals");
+              // No need to manually update state as onSnapshot will handle it
+            } catch (error) {
+              console.error("Error deleting all goals: ", error);
+              Alert.alert("Error", "Failed to delete all goals. Please try again.");
+            }
+          }
         }
       ]
     );
   };
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
