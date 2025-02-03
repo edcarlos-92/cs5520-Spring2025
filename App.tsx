@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Input from '@/components/Input';
 import { useState } from 'react';
 import GoalItem from '@/components/GoalItem';
+import { app } from '@/Firebase/firebaseSetup';
 
 export interface Goal {
   text: string;
@@ -11,6 +12,9 @@ export interface Goal {
 }
 
 export default function App() {
+
+  // console.log(app);
+
   const appName = "my awesome app";
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [goals, setGoals] = useState<Goal[]>([]);
