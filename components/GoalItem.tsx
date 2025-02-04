@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { Goal } from '@/App';
+import { GoalFromDB } from '@/App';
 
 interface GoalItemProps {
-    goal: Goal;
-    onDelete: (id: number) => void;
+    goal: GoalFromDB;
+    onDelete: (id: string) => void;
 }
 
 const GoalItem = ({ goal, onDelete }: GoalItemProps) => {
