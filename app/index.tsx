@@ -1,229 +1,192 @@
-import { StatusBar } from 'expo-status-bar';
-import { Button, FlatList, SafeAreaView, StyleSheet, View, Text, Alert } from 'react-native';
-import Header from '@/components/Header';
-import Input from '@/components/Input';
-import { useState, useEffect } from 'react';
-import GoalItem from '@/components/GoalItem';
-import { deleteFromDB, writeToDB } from '@/Firebase/firestoreHelper';
-import { collection, onSnapshot } from 'firebase/firestore';
-import { database } from '@/Firebase/firebaseSetup';
+import { StatusBar } from "expo-status-bar";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Button,
+  SafeAreaView,
+  ScrollView,
+  FlatList,
+  Alert,
+} from "react-native";
+import Header from "@/components/Header";
+import Input from "../components/Input";
+import { useEffect, useState } from "react";
+import GoalItem from "../components/GoalItem";
+import { GoalData, writeToDB, deleteFromDB } from "../Firebase/firestoreHelper";
+import { collection, onSnapshot } from "firebase/firestore";
+import { database } from "../Firebase/firebaseSetup";
 
-export interface GoalFromDB {
-  text: string;
+export interface GoalFromDB extends GoalData {
   id: string;
 }
+
 export default function App() {
-  const appName = "my awesome app";
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const appName = "My Awesome App";
   const [goals, setGoals] = useState<GoalFromDB[]>([]);
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
   useEffect(() => {
-    console.log('Setting up Firestore listener...');
-
-    const unsubscribe = onSnapshot(collection(database, "goals"), (querySnapshot) => {
-      if (!querySnapshot.empty) {
-        const goalsData: GoalFromDB[] = [];
-        querySnapshot.forEach((doc) => {
-          goalsData.push({
-            ...doc.data(),        // spread the document data or ...doc.data() as GoalFromDB,
-            id: doc.id            // add the document ID
-          } as GoalFromDB);
-        });
-        setGoals(goalsData);
-      } else {
-        setGoals([]);
+    //start the listener on real time changes on goals collection
+    const unsubscribe = onSnapshot(
+      collection(database, "goals"),
+      (querySnapshot) => {
+        //check if the querySnapshot is empty
+        if (querySnapshot.empty) {
+          setGoals([]);
+        } else {
+          let newArrayOfGoals: GoalFromDB[] = [];
+          querySnapshot.forEach((docSnapshot) => {
+            console.log(docSnapshot.id);
+            newArrayOfGoals.push({
+              ...(docSnapshot.data() as GoalData),
+              id: docSnapshot.id,
+            });
+          });
+          console.log("newArrayOfGoals", newArrayOfGoals);
+          setGoals(newArrayOfGoals);
+        }
       }
-    });
-
-    // Cleanup function that runs when component unmounts
+    );
+    //return a cleanup function to stop the listener
     return () => {
-      console.log('Detaching Firestore listener...');
       unsubscribe();
     };
   }, []);
+  function handleDeleteGoal(deletedId: string) {
+    //which goal was deleted?
+    //I need to update the goals array by removing the goal
+    //filter out the goal with the id that was passed
 
-
-  const handleInputData = async (text: string) => {
+    // setGoals((prevGoals) => {
+    //   return prevGoals.filter((goalObj) => {
+    //     return goalObj.id !== deletedId;
+    //   });
+    // });
+    //delete from db
+    //call the function from firestoreHelper
+    deleteFromDB(deletedId, "goals");
+  }
+  function handleInputData(data: string) {
+    // this function will receive data from Input
+    console.log("data received from Input ", data);
+    //store the data in the state variable
+    // setReceivedData(data);
+    //close the modal
+    // define a variable of type Goal object
+    let newGoal: GoalData = { text: data };
+    // write to db by calling the functionf rom firestoreHelper
+    writeToDB(newGoal, "goals");
+    //update it with the data received from Input and a random number
+    // add the object to the goals array
+    // use updater function in setState whenever you are
+    // updating the state based on the previous state
+    // setGoals((currGoals) => {
+    //   return [...currGoals, newGoal];
+    // });
     setIsModalVisible(false);
-    const GoalFromDB = {
-      text: text
-    };
-
-    try {
-      await writeToDB(GoalFromDB, "goals");
-      // Removed manual state update since onSnapshot handles it
-    } catch (error) {
-      console.error("Error writing goal to database: ", error);
-    }
-  };
-
-  const handleCancel = () => {
+  }
+  function dismissModal() {
     setIsModalVisible(false);
-  };
+  }
+  function deleteAll() {
+    Alert.alert("Delete All", "Are you sure you want to delete all goals?", [
+      {
+        text: "Yes",
+        onPress: () => {
 
-  // const handleDeleteGoal = (deletedId: string) => {
-  //   setGoals(prevGoals => prevGoals.filter(goal => goal.id !== deletedId));
-  // };
-
-  const handleDeleteGoal = async (deletedId: string) => {
-    try {
-      await deleteFromDB(deletedId, "goals");
-      // No need to manually update state as onSnapshot will handle it
-    } catch (error) {
-      console.error("Error deleting goal from database: ", error);
-      Alert.alert("Error", "Failed to delete goal. Please try again.");
-    }
-  };
-
-  const handleDeleteAll = () => {
-    Alert.alert(
-      "Delete All Goals",
-      "Are you sure you want to delete all goals?",
-      [
-        {
-          text: "No",
-          style: "cancel"
-        },
-        {
-          text: "Yes",
-          onPress: async () => {
-            try {
-              // await deleteAllFromDB("goals");
-              // No need to manually update state as onSnapshot will handle it
-            } catch (error) {
-              console.error("Error deleting all goals: ", error);
-              Alert.alert("Error", "Failed to delete all goals. Please try again.");
-            }
+          try {
+            goals.forEach((goal) => {
+              deleteFromDB(goal.id, "goals");
+            });
+          } catch {
+            console.log("error deleting all goals")
           }
-        }
-      ]
-    );
-  };
-
-
+          setGoals([]);
+        },
+      },
+      { text: "No", style: "cancel" },
+    ]);
+  }
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.topSection}>
-          <View style={styles.headerSection}>
-            <Header appHeaderText={appName} />
-          </View>
-
-          <View style={styles.buttonSection}>
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Add a goal"
-                onPress={() => setIsModalVisible(true)}
-              />
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.listSection}>
-          <FlatList
-            data={goals}
-            contentContainerStyle={styles.flatListContent}
-            renderItem={({ item }) => (
-              <View style={styles.itemContainer}>
-                <GoalItem goal={item} onDelete={handleDeleteGoal} />
-              </View>
-            )}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>No goals to show</Text>
-            }
-            ListHeaderComponent={
-              goals.length > 0 ? (
-                <Text style={styles.listHeader}>My Goals</Text>
-              ) : null
-            }
-            ListFooterComponent={
-              goals.length > 0 ? (
-                <View style={styles.footerContainer}>
-                  <Button title="Delete All" onPress={handleDeleteAll} color="red" />
-                </View>
-              ) : null
-            }
-            ItemSeparatorComponent={() => (
-              <View style={styles.separator} />
-            )}
-          />
-        </View>
-
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="auto" />
+      <View style={styles.topContainer}>
+        <Header name={appName} />
         <Input
-          autoFocusInput={true}
+          textInputFocus={true}
           inputHandler={handleInputData}
-          onCancel={handleCancel}
-          visible={isModalVisible}
+          modalVisible={isModalVisible}
+          dismissModal={dismissModal}
         />
-
-        <StatusBar style="auto" />
+        <Button title="Add a Goal" onPress={() => setIsModalVisible(true)} />
+      </View>
+      <View style={styles.bottomContainer}>
+        <FlatList
+          ItemSeparatorComponent={() => (
+            <View
+              style={{
+                height: 5,
+                backgroundColor: "gray",
+              }}
+            />
+          )}
+          ListEmptyComponent={
+            <Text style={styles.header}>No goals to show</Text>
+          }
+          ListHeaderComponent={
+            goals.length > 0 ? (
+              <Text style={styles.header}>My Goals List</Text>
+            ) : null
+          }
+          ListFooterComponent={
+            goals.length ? (
+              <Button title="Delete all" onPress={deleteAll} />
+            ) : null
+          }
+          contentContainerStyle={styles.centeredHorizontal}
+          data={goals}
+          renderItem={({ item }) => {
+            //pass the received item to GoalItem component as a prop
+            return <GoalItem goalObj={item} deleteHandler={handleDeleteGoal} />;
+          }}
+        />
+        {/* <ScrollView contentContainerStyle={styles.centeredHorizontal}>
+          {goals.map((goalObj) => {
+            return (
+              <View key={goalObj.id}>
+                <Text style={styles.text}>{goalObj.text} </Text>
+              </View>
+            );
+          })}
+        </ScrollView> */}
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   container: {
+    flex: 2,
+    backgroundColor: "#fff",
+    // alignItems: "center",
+    justifyContent: "center",
+  },
+  topContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    alignItems: "center",
+    justifyContent: "space-around",
   },
-  topSection: {
-    paddingVertical: 16,
+  bottomContainer: {
+    flex: 4,
+    backgroundColor: "#dcd",
+    // alignItems: "center",
   },
-  headerSection: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-    marginTop: 40
+  centeredHorizontal: {
+    alignItems: "center",
   },
-  buttonSection: {
-    alignItems: 'center',
-    marginBottom: 10,
-    marginTop: 10
-  },
-  buttonContainer: {
-    width: '30%',
-  },
-  listSection: {
-    flex: 1,
-    backgroundColor: '#fae7e6',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-  },
-  flatListContent: {
-    width: '100%',
-  },
-  itemContainer: {
-    width: '100%',
-  },
-  emptyText: {
-    fontSize: 16,
-    color: 'purple',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  listHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'purple',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  footerContainer: {
-    marginTop: 20,
-    width: '50%',
-    alignSelf: 'center',
-  },
-  separator: {
-    height: 5,
-    backgroundColor: '#ccc',
-    width: '45%',
-    marginVertical: 8,
-    alignSelf: 'center',
+  header: {
+    color: "indigo",
+    fontSize: 25,
+    marginTop: 10,
   },
 });

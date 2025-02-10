@@ -1,39 +1,25 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
 
+// type HeaderProps = {name:string};
 interface HeaderProps {
-    appHeaderText: string;
+    name: string;
 }
-
-export default function Header(props: HeaderProps) {
-
+export default function Header({ name }: HeaderProps) {
     return (
-        <View style={styles.headerContainer}>
-            <Text style={styles.headerText}>{`Welcome to ${props.appHeaderText}`}</Text>
+        <View>
+            <Text style={styles.textStyle}>Welcome to {name}</Text>
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
-    headerContainer: {
+    textStyle: {
+        color: "purple",
+        fontSize: 25,
+        borderColor: "purple",
         borderWidth: 2,
-        borderColor: 'purple',
-        borderRadius: 10,
-        backgroundColor: '#F5F5F5',
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
+        padding: 5,
+        marginBottom: 10,
     },
-    headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: 'purple',
-    }
 });
