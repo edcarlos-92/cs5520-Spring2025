@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { GoalFromDB } from '@/App';
+import { GoalFromDB } from '@/app';
+import { Link, router } from 'expo-router';
 
 interface GoalItemProps {
     goal: GoalFromDB;
@@ -10,6 +11,7 @@ const GoalItem = ({ goal, onDelete }: GoalItemProps) => {
     return (
         <View style={styles.goalContainer}>
             <Text style={styles.submittedGoal}>{goal.text}</Text>
+
             <View style={styles.deleteButton}>
                 <Button
                     title="X"
@@ -17,6 +19,18 @@ const GoalItem = ({ goal, onDelete }: GoalItemProps) => {
                     color="gray"
                 />
             </View>
+            {/* <Link href={`/goals/${goal.id}`} style={styles.infoLink} asChild>
+                <Button title="Info" />
+            </Link> */}
+
+            <Button title="Info"
+                onPress={() => {
+                    router.navigate(`/goals/${goal.id}`);
+                }}
+            />
+
+
+
         </View>
     );
 };
@@ -41,7 +55,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'gray',
         justifyContent: 'center',
         width: 50
-    }
+    },
+    infoLink: {
+        padding: 10,
+        color: 'blue',
+        fontWeight: 'bold',
+        marginTop: 10
+    },
 });
 
 export default GoalItem;

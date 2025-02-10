@@ -3,7 +3,7 @@ import { Button, FlatList, SafeAreaView, StyleSheet, View, Text, Alert } from 'r
 import Header from '@/components/Header';
 import Input from '@/components/Input';
 import { useState, useEffect } from 'react';
-import GoalItem from '@/playground/week5/p/Activity - Delete data from Firestore /GoalItem';
+import GoalItem from '@/components/GoalItem';
 import { deleteFromDB, writeToDB } from '@/Firebase/firestoreHelper';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { database } from '@/Firebase/firebaseSetup';
