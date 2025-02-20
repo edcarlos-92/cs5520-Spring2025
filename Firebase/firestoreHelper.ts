@@ -1,32 +1,56 @@
-// Firebase/firestoreHelper.ts
-
-import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { database } from '@/Firebase/firebaseSetup';
-import { doc, deleteDoc } from 'firebase/firestore';
-
-export interface goalData {
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+} from 'firebase/firestore';
+import { database } from './firebaseSetup';
+export interface GoalData {
   text: string;
+  warning?: boolean;
 }
-
-export async function writeToDB(data: goalData, collectionName: string) {
+export async function writeToDB(data: GoalData, collectionName: string) {
   try {
     const docRef = await addDoc(collection(database, collectionName), data);
-    console.log('Document written with ID: ', docRef.id);
-    return docRef;
-  } catch (err) {
-    console.log('Error adding document: ', err);
-    throw err;
+  } catch (e) {
+    console.error('Error adding document: ', e);
   }
 }
 
+//delete a document from the database
 export async function deleteFromDB(id: string, collectionName: string) {
   try {
+    await deleteDoc(doc(database, collectionName, id));
+  } catch (e) {
+    console.error('Error deleting document: ', e);
+  }
+}
+export async function readDocFromDB(id: string, collectionName: string) {
+  try {
     const docRef = doc(database, collectionName, id);
-    await deleteDoc(docRef);
-    console.log('Document successfully deleted: ', id);
-  } catch (err) {
-    console.log('Error deleting document: ', err);
-    throw err;
+    const docSnapshot = await getDoc(docRef);
+    if (docSnapshot.exists()) {
+      return docSnapshot.data();
+    }
+    return null;
+  } catch (e) {
+    console.error('Error reading document: ', e);
+  }
+}
+
+export async function updateDB(
+  id: string,
+  collectionName: string,
+  data: { [key: string]: any }
+) {
+  try {
+    //update a document in the database
+    await setDoc(doc(database, collectionName, id), data, { merge: true });
+  } catch (e) {
+    console.error('Error updating document: ', e);
   }
 }
 

@@ -1,47 +1,46 @@
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { GoalFromDB } from '@/App';
+import { Button, StyleSheet, Text, View } from "react-native";
+import React from "react";
+import { Link, router } from "expo-router";
+import { GoalFromDB } from "@/app";
 
 interface GoalItemProps {
-    goal: GoalFromDB;
-    onDelete: (id: string) => void;
+    goalObj: GoalFromDB;
+    deleteHandler: (deletedId: string) => void;
 }
-
-const GoalItem = ({ goal, onDelete }: GoalItemProps) => {
+export default function GoalItem({ goalObj, deleteHandler }: GoalItemProps) {
     return (
-        <View style={styles.goalContainer}>
-            <Text style={styles.submittedGoal}>{goal.text}</Text>
-            <View style={styles.deleteButton}>
-                <Button
-                    title="X"
-                    onPress={() => onDelete(goal.id)}
-                    color="gray"
-                />
-            </View>
+        <View style={styles.textContainer}>
+            <Text style={styles.text}>{goalObj.text} </Text>
+            <Button
+                title="X"
+                onPress={() => {
+                    //pass the id
+                    deleteHandler(goalObj.id);
+                }}
+            />
+            {/* <Link asChild href={`/goals/${goalObj.id}`}> */}
+            <Button
+                title="info"
+                onPress={() => {
+                    router.navigate(`/goals/${goalObj.id}?sort="asc"`);
+                }}
+            />
+            {/* </Link> */}
         </View>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    goalContainer: {
-        flexDirection: 'row',
-        backgroundColor: '#d7d9d7',
-        borderRadius: 8,
-        width: 'auto',
-        marginTop: 8,
-        alignSelf: 'center',
-        overflow: 'hidden'
+    textContainer: {
+        flexDirection: "row",
+        borderRadius: 5,
+        backgroundColor: "#aaa",
+        padding: 10,
+        alignItems: "center",
+        marginVertical: 10,
     },
-    submittedGoal: {
-        fontSize: 16,
-        color: 'purple',
-        padding: 16,
-        textAlign: 'center'
+    text: {
+        color: "purple",
+        fontSize: 20,
     },
-    deleteButton: {
-        backgroundColor: 'gray',
-        justifyContent: 'center',
-        width: 50
-    }
 });
-
-export default GoalItem;
