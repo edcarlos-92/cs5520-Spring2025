@@ -1,4 +1,4 @@
-import { View, Text, Button, StyleSheet, Pressable } from "react-native";
+import { View, Text, Button, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Stack, useLocalSearchParams, useNavigation } from "expo-router";
 import { GoalData, readDocFromDB, updateDB } from "@/Firebase/firestoreHelper";
@@ -35,19 +35,9 @@ export default function GoalDetails() {
             <Stack.Screen
                 options={{
                     headerTitle: goal ? (warning ? "warning" : goal.text) : "",
-                    // headerRight: () => {
-                    //     return <Button title="Warning" onPress={warningHandler} />;
-                    // },
-
                     headerRight: () => {
-                        return (
-                            <Pressable onPressIn={warningHandler}>
-                                <Text style={{ color: 'white', marginRight: 10 }}>Warning</Text>
-                            </Pressable>
-                        )
-                    }
-
-
+                        return <Button title="Warning" onPress={warningHandler} />;
+                    },
                 }}
             />
             <Text style={warning && styles.warningText}>Details of {goal?.text}</Text>
