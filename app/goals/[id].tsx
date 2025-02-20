@@ -63,7 +63,6 @@ export default function GoalDetails() {
                 </PressableButton>
             </View>
 
-
         </View>
     );
 }
