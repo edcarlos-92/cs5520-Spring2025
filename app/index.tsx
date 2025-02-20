@@ -16,6 +16,7 @@ import GoalItem from "../components/GoalItem";
 import { GoalData, writeToDB, deleteFromDB } from "../Firebase/firestoreHelper";
 import { collection, onSnapshot } from "firebase/firestore";
 import { database } from "../Firebase/firebaseSetup";
+import PressableButton from "@/components/PressableButton";
 
 export interface GoalFromDB extends GoalData {
   id: string;
@@ -93,14 +94,6 @@ export default function App() {
       {
         text: "Yes",
         onPress: () => {
-
-          try {
-            goals.forEach((goal) => {
-              deleteFromDB(goal.id, "goals");
-            });
-          } catch {
-            console.log("error deleting all goals")
-          }
           setGoals([]);
         },
       },
@@ -118,7 +111,10 @@ export default function App() {
           modalVisible={isModalVisible}
           dismissModal={dismissModal}
         />
-        <Button title="Add a Goal" onPress={() => setIsModalVisible(true)} />
+        <PressableButton pressedHandler={() => setIsModalVisible(true)}>
+          <Text style={styles.addGoalButton}>Add a Goal</Text>
+        </PressableButton>
+        {/* <Button title="Add a Goal" onPress={() => setIsModalVisible(true)} /> */}
       </View>
       <View style={styles.bottomContainer}>
         <FlatList
@@ -188,5 +184,10 @@ const styles = StyleSheet.create({
     color: "indigo",
     fontSize: 25,
     marginTop: 10,
+  },
+  addGoalButton: {
+    padding: 5,
+    fontSize: 15,
+    color: "white",
   },
 });
