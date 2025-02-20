@@ -17,6 +17,7 @@ import { GoalData, writeToDB, deleteFromDB } from "../Firebase/firestoreHelper";
 import { collection, onSnapshot } from "firebase/firestore";
 import { database } from "../Firebase/firebaseSetup";
 import PressableButton from "@/components/PressableButton";
+import { router } from "expo-router";
 
 export interface GoalFromDB extends GoalData {
   id: string;
@@ -117,13 +118,17 @@ export default function App() {
         {/* <Button title="Add a Goal" onPress={() => setIsModalVisible(true)} /> */}
       </View>
       <View style={styles.bottomContainer}>
+
+
         <FlatList
-          ItemSeparatorComponent={() => (
+          ItemSeparatorComponent={({ highlighted }) => (
             <View
-              style={{
-                height: 5,
-                backgroundColor: "gray",
-              }}
+              style={[
+                {
+                  height: 5,
+                  backgroundColor: highlighted ? "purple" : "gray",
+                }
+              ]}
             />
           )}
           ListEmptyComponent={
@@ -141,10 +146,13 @@ export default function App() {
           }
           contentContainerStyle={styles.centeredHorizontal}
           data={goals}
-          renderItem={({ item }) => {
-            //pass the received item to GoalItem component as a prop
-            return <GoalItem goalObj={item} deleteHandler={handleDeleteGoal} />;
-          }}
+          renderItem={({ item, separators }) => (
+            <GoalItem
+              goalObj={item}
+              deleteHandler={handleDeleteGoal}
+              separators={separators}
+            />
+          )}
         />
         {/* <ScrollView contentContainerStyle={styles.centeredHorizontal}>
           {goals.map((goalObj) => {
