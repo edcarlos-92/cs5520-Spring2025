@@ -1,13 +1,14 @@
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Stack, useLocalSearchParams, useNavigation } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { GoalData, readDocFromDB, updateDB } from "@/Firebase/firestoreHelper";
+import PressableButton from "@/components/PressableButton";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function GoalDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const [goal, setGoal] = useState<GoalData | null>(null);
     const [warning, setWarning] = useState(false);
-    //   const navigation = useNavigation();
 
     useEffect(() => {
         async function getData() {
@@ -18,7 +19,6 @@ export default function GoalDetails() {
                         setWarning(true);
                     }
                     setGoal(data);
-                    //   navigation.setOptions({ headerTitle: data.text });
                 }
             } catch (e) {
                 console.log("get data in GoalDetails", e);
@@ -26,25 +26,45 @@ export default function GoalDetails() {
         }
         getData();
     }, []);
+
     function warningHandler() {
+        console.log("warning handler");
         setWarning(true);
         updateDB(id, "goals", { warning: true });
     }
+
     return (
         <View>
             <Stack.Screen
                 options={{
                     headerTitle: goal ? (warning ? "warning" : goal.text) : "",
-                    headerRight: () => {
-                        return <Button title="Warning" onPress={warningHandler} />;
-                    },
+                    headerRight: () => (
+                        <View style={styles.headerButton}>
+                            <PressableButton
+                                pressedHandler={() => { }}
+                                pressedInHandler={warningHandler}
+                                componentStyle={styles.warningButton}
+                            >
+                                <Ionicons name="warning" size={24} color="white" />
+                            </PressableButton>
+                        </View>
+                    ),
                 }}
             />
-            <Text style={warning && styles.warningText}>Details of {goal?.text}</Text>
+            <Text style={warning ? styles.warningText : undefined}>Details of {goal?.text}</Text>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    warningText: { color: "red" },
+    warningText: {
+        color: "red"
+    },
+    headerButton: {
+        marginRight: 10
+    },
+    warningButton: {
+        backgroundColor: 'transparent',
+        padding: 8
+    }
 });
