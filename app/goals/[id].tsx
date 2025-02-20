@@ -52,6 +52,18 @@ export default function GoalDetails() {
                 }}
             />
             <Text style={warning ? styles.warningText : undefined}>Details of {goal?.text}</Text>
+
+            <View style={styles.addMorecontainer}>
+
+                <PressableButton
+                    pressedHandler={() => { }}
+                    componentStyle={styles.moreDetailsButtonContainer}
+                >
+                    <Text style={styles.moreDetailsButton}>More Details</Text>
+                </PressableButton>
+            </View>
+
+
         </View>
     );
 }
@@ -66,5 +78,23 @@ const styles = StyleSheet.create({
     warningButton: {
         backgroundColor: 'transparent',
         padding: 8
-    }
+    },
+    moredetailsButton: {
+        color: "blue",
+    },
+    moreDetailsButtonContainer: {
+        backgroundColor: 'purple',
+        marginTop: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    moreDetailsButton: {
+        color: 'white',
+        fontSize: 16,
+    },
+    addMorecontainer: {
+        alignItems: 'center',
+        padding: 20,
+    },
 });

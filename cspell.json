@@ -3,6 +3,8 @@
     "words": [
         "Pressable",
         "Ionicons",
-        "firestore"
+        "firestore",
+        "moredetails",
+        "addMorecontainer"
     ]
 }
