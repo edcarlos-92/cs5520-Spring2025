@@ -5,6 +5,7 @@
         "Ionicons",
         "firestore",
         "moredetails",
-        "addMorecontainer"
+        "addMorecontainer",
+        "subcollection"
     ]
 }

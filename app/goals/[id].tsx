@@ -4,6 +4,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { GoalData, readDocFromDB, updateDB } from "@/Firebase/firestoreHelper";
 import PressableButton from "@/components/PressableButton";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import GoalUsers from "@/components/GoalDetails";
 
 export default function GoalDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -34,7 +35,7 @@ export default function GoalDetails() {
     }
 
     return (
-        <View>
+        <View style={{ flex: 1 }}>
             <Stack.Screen
                 options={{
                     headerTitle: goal ? (warning ? "warning" : goal.text) : "",
@@ -62,6 +63,8 @@ export default function GoalDetails() {
                     <Text style={styles.moreDetailsButton}>More Details</Text>
                 </PressableButton>
             </View>
+
+            <GoalUsers goalId={id} />
 
         </View>
     );

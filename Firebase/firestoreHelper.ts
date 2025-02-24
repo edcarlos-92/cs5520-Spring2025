@@ -65,3 +65,17 @@ export async function deleteAllFromDB(collectionName: string) {
     throw err;
   }
 }
+
+export async function readDocsFromCollection(collectionPath: string) {
+  try {
+    const querySnapshot = await getDocs(collection(database, collectionPath));
+    const documents: any[] = [];
+    querySnapshot.forEach((doc) => {
+      documents.push({ id: doc.id, ...doc.data() });
+    });
+    return documents;
+  } catch (e) {
+    console.error('Error reading collection: ', e);
+    return [];
+  }
+}
