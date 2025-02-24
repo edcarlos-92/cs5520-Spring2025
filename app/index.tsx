@@ -13,14 +13,11 @@ import Header from "@/components/Header";
 import Input from "../components/Input";
 import { useEffect, useState } from "react";
 import GoalItem from "../components/GoalItem";
-import { GoalData, writeToDB, deleteFromDB } from "../Firebase/firestoreHelper";
+import { writeToDB, deleteFromDB } from "../Firebase/firestoreHelper";
 import { collection, onSnapshot } from "firebase/firestore";
 import { database } from "../Firebase/firebaseSetup";
 import PressableButton from "@/components/PressableButton";
-
-export interface GoalFromDB extends GoalData {
-  id: string;
-}
+import { GoalData, GoalFromDB } from "@/types";
 
 export default function App() {
   const appName = "My Awesome App";
@@ -118,11 +115,11 @@ export default function App() {
       </View>
       <View style={styles.bottomContainer}>
         <FlatList
-          ItemSeparatorComponent={() => (
+          ItemSeparatorComponent={({ highlighted }) => (
             <View
               style={{
                 height: 5,
-                backgroundColor: "gray",
+                backgroundColor: highlighted ? "purple" : "gray",
               }}
             />
           )}
@@ -141,9 +138,15 @@ export default function App() {
           }
           contentContainerStyle={styles.centeredHorizontal}
           data={goals}
-          renderItem={({ item }) => {
+          renderItem={({ item, separators }) => {
             //pass the received item to GoalItem component as a prop
-            return <GoalItem goalObj={item} deleteHandler={handleDeleteGoal} />;
+            return (
+              <GoalItem
+                goalObj={item}
+                deleteHandler={handleDeleteGoal}
+                separators={separators}
+              />
+            );
           }}
         />
         {/* <ScrollView contentContainerStyle={styles.centeredHorizontal}>
