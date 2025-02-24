@@ -1,14 +1,17 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Stack, useLocalSearchParams } from "expo-router";
-import { GoalData, readDocFromDB, updateDB } from "@/Firebase/firestoreHelper";
+import { Stack, useLocalSearchParams, useNavigation } from "expo-router";
+import { readDocFromDB, updateDB } from "@/Firebase/firestoreHelper";
 import PressableButton from "@/components/PressableButton";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import GoalUsers from "@/components/GoalUsers";
+import { GoalData } from "@/types";
 
 export default function GoalDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const [goal, setGoal] = useState<GoalData | null>(null);
     const [warning, setWarning] = useState(false);
+    //   const navigation = useNavigation();
 
     useEffect(() => {
         async function getData() {
@@ -19,6 +22,7 @@ export default function GoalDetails() {
                         setWarning(true);
                     }
                     setGoal(data);
+                    //   navigation.setOptions({ headerTitle: data.text });
                 }
             } catch (e) {
                 console.log("get data in GoalDetails", e);
@@ -26,74 +30,37 @@ export default function GoalDetails() {
         }
         getData();
     }, []);
-
     function warningHandler() {
-        console.log("warning handler");
         setWarning(true);
         updateDB(id, "goals", { warning: true });
     }
-
     return (
         <View>
             <Stack.Screen
                 options={{
                     headerTitle: goal ? (warning ? "warning" : goal.text) : "",
-                    headerRight: () => (
-                        <View style={styles.headerButton}>
+                    headerRight: () => {
+                        // return <Button title="Warning" onPress={warningHandler} />;
+                        return (
                             <PressableButton
-                                pressedHandler={() => { }}
-                                pressedInHandler={warningHandler}
-                                componentStyle={styles.warningButton}
+                                componentStyle={styles.warningIcon}
+                                pressedHandler={warningHandler}
                             >
                                 <Ionicons name="warning" size={24} color="white" />
                             </PressableButton>
-                        </View>
-                    ),
+                        );
+                    },
                 }}
             />
-            <Text style={warning ? styles.warningText : undefined}>Details of {goal?.text}</Text>
-
-            <View style={styles.addMorecontainer}>
-
-                <PressableButton
-                    pressedHandler={() => { }}
-                    componentStyle={styles.moreDetailsButtonContainer}
-                >
-                    <Text style={styles.moreDetailsButton}>More Details</Text>
-                </PressableButton>
-            </View>
-
+            <Text style={warning && styles.warningText}>Details of {goal?.text}</Text>
+            <GoalUsers goalId={id} />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    warningText: {
-        color: "red"
-    },
-    headerButton: {
-        marginRight: 10
-    },
-    warningButton: {
-        backgroundColor: 'transparent',
-        padding: 8
-    },
-    moredetailsButton: {
-        color: "blue",
-    },
-    moreDetailsButtonContainer: {
-        backgroundColor: 'purple',
-        marginTop: 20,
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-        borderRadius: 5,
-    },
-    moreDetailsButton: {
-        color: 'white',
-        fontSize: 16,
-    },
-    addMorecontainer: {
-        alignItems: 'center',
-        padding: 20,
+    warningText: { color: "red" },
+    warningIcon: {
+        backgroundColor: "purple",
     },
 });
