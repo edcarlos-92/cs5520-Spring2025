@@ -13,15 +13,11 @@ import Header from "@/components/Header";
 import Input from "../components/Input";
 import { useEffect, useState } from "react";
 import GoalItem from "../components/GoalItem";
-import { GoalData, writeToDB, deleteFromDB } from "../Firebase/firestoreHelper";
+import { writeToDB, deleteFromDB } from "../Firebase/firestoreHelper";
 import { collection, onSnapshot } from "firebase/firestore";
 import { database } from "../Firebase/firebaseSetup";
 import PressableButton from "@/components/PressableButton";
-import { router } from "expo-router";
-
-export interface GoalFromDB extends GoalData {
-  id: string;
-}
+import { GoalData, GoalFromDB } from "@/types";
 
 export default function App() {
   const appName = "My Awesome App";
@@ -118,17 +114,13 @@ export default function App() {
         {/* <Button title="Add a Goal" onPress={() => setIsModalVisible(true)} /> */}
       </View>
       <View style={styles.bottomContainer}>
-
-
         <FlatList
           ItemSeparatorComponent={({ highlighted }) => (
             <View
-              style={[
-                {
-                  height: 5,
-                  backgroundColor: highlighted ? "purple" : "gray",
-                }
-              ]}
+              style={{
+                height: 5,
+                backgroundColor: highlighted ? "purple" : "gray",
+              }}
             />
           )}
           ListEmptyComponent={
@@ -146,13 +138,16 @@ export default function App() {
           }
           contentContainerStyle={styles.centeredHorizontal}
           data={goals}
-          renderItem={({ item, separators }) => (
-            <GoalItem
-              goalObj={item}
-              deleteHandler={handleDeleteGoal}
-              separators={separators}
-            />
-          )}
+          renderItem={({ item, separators }) => {
+            //pass the received item to GoalItem component as a prop
+            return (
+              <GoalItem
+                goalObj={item}
+                deleteHandler={handleDeleteGoal}
+                separators={separators}
+              />
+            );
+          }}
         />
         {/* <ScrollView contentContainerStyle={styles.centeredHorizontal}>
           {goals.map((goalObj) => {
