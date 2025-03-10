@@ -1,7 +1,7 @@
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { router } from "expo-router";
-import { GoalFromDB } from "@/app/index";
+import { GoalFromDB } from "@/app/(protected)/index";
 import PressableButton from "./PressableButton";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
