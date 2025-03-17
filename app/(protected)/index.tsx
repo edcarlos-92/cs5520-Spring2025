@@ -17,7 +17,8 @@ import { writeToDB, deleteFromDB } from "@/Firebase/firestoreHelper";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { database, auth } from "@/Firebase/firebaseSetup";
 import PressableButton from "@/components/PressableButton";
-import { GoalData, GoalFromDB } from "@/types";
+import { GoalData, GoalFromDB, userInput } from "@/types";
+import ImageManager from "@/components/ImageManager";
 
 export default function App() {
   const appName = "My Awesome App";
@@ -30,15 +31,23 @@ export default function App() {
     // Only continue if user is authenticated
     if (!auth.currentUser) return;
 
-    //start the listener on real time changes on goals collection filtered by owner
+    // Query the database for goals that belong to the current user
     const goalsQuery = query(
       collection(database, "goals"),
       where("owner", "==", auth.currentUser.uid)
     );
 
     const unsubscribe = onSnapshot(
+
+      // collection(database,"goals"),
+
       goalsQuery,
       (querySnapshot) => {
+
+        //replce
+
+
+
         //check if the querySnapshot is empty
         if (querySnapshot.empty) {
           setGoals([]);
@@ -86,7 +95,7 @@ export default function App() {
     //call the function from firestoreHelper
     deleteFromDB(deletedId, "goals");
   }
-  function handleInputData(data: string) {
+  function handleInputData(data: userInput) {
     // this function will receive data from Input
     console.log("data received from Input ", data);
     //store the data in the state variable
@@ -97,8 +106,8 @@ export default function App() {
 
 
     let newGoal: GoalData = {
-      text: data,
-      owner: auth.currentUser?.uid || "defaultOwner"
+      text: data.text,
+      owner: auth.currentUser?.uid ? auth.currentUser.uid : null,
     };
 
 
@@ -130,6 +139,9 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
+
+
+
       <View style={styles.topContainer}>
         <Header name={appName} />
         <Input
@@ -179,6 +191,9 @@ export default function App() {
             );
           }}
         />
+
+
+
         {/* <ScrollView contentContainerStyle={styles.centeredHorizontal}>
           {goals.map((goalObj) => {
             return (
@@ -188,7 +203,12 @@ export default function App() {
             );
           })}
         </ScrollView> */}
+
+
+
       </View>
+
+
     </SafeAreaView>
   );
 }
