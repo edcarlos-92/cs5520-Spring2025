@@ -1,7 +1,7 @@
 export interface GoalData {
   text: string;
   warning?: boolean;
-  owner: string;
+  owner: string | null;
 }
 
 export interface User {
@@ -26,4 +26,9 @@ export interface Geo {
 }
 export interface GoalFromDB extends GoalData {
   id: string;
+}
+
+export interface userInput {
+  text: string;
+  uri: string;
 }
