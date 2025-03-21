@@ -1,10 +1,12 @@
 {
     "version": "0.2",
     "words": [
-        "Pressable",
-        "Ionicons",
+        "addMorecontainer",
         "firestore",
+        "Imagehandler",
+        "Ionicons",
         "moredetails",
-        "addMorecontainer"
+        "Pressable",
+        "setimage"
     ]
 }
