@@ -33,3 +33,8 @@ export interface userInput {
   text: string;
   imageUri: string;
 }
+
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+}
