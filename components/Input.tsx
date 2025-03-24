@@ -16,9 +16,6 @@ import { userInput } from "@/types";
 interface InputProps {
     textInputFocus: boolean;
     inputHandler: (data: userInput) => void;
-
-
-
     modalVisible: boolean;
     dismissModal: () => void;
 }
@@ -41,9 +38,16 @@ export default function Input({
         console.log("user has typed ", text);
         // call the callback from App
         //pass the data that user typed
-        inputHandler({ text, uri: takenImageUri });
+        // pass the image uri if exists
+        inputHandler({ text: text, imageUri: takenImageUri });
         setText("");
+
     }
+
+    function imageUriHandler(uri: string) {
+        setTakenImageUri(uri);
+    }
+
     function handleCancel() {
         // hide the modal
         Alert.alert("Cancel", "Are you sure you want to cancel", [
@@ -57,12 +61,6 @@ export default function Input({
             },
         ]);
     }
-
-    function imageUirHandler(imageUri: string) {
-        console.log("Image uri received in Input", imageUri);
-        setTakenImageUri(imageUri);
-    }
-
 
     return (
         <Modal transparent={true} visible={modalVisible} animationType="slide">
@@ -93,10 +91,6 @@ export default function Input({
                             setBlur(false);
                         }}
                     />
-
-                    <ImageManager onImageUri={imageUirHandler} />
-
-
                     {blur ? (
                         text.length >= 3 ? (
                             <Text style={styles.text}>Thank you</Text>
@@ -108,6 +102,7 @@ export default function Input({
                     ) : (
                         text && <Text style={styles.text}>{text.length}</Text>
                     )}
+                    <ImageManager onImageUri={imageUriHandler} />
                     <View style={styles.buttonsRow}>
                         <View style={styles.buttonContainer}>
                             <Button title="Cancel" onPress={handleCancel} />

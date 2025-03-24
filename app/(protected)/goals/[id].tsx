@@ -6,11 +6,16 @@ import PressableButton from "@/components/PressableButton";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import GoalUsers from "@/components/GoalUsers";
 import { GoalData } from "@/types";
+import { getDownloadURL, ref } from "firebase/storage";
+import { storage } from "@/Firebase/firebaseSetup";
 
 export default function GoalDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const [goal, setGoal] = useState<GoalData | null>(null);
     const [warning, setWarning] = useState(false);
+
+    const [url, setUrl] = useState<string | null>(null);
+
     //   const navigation = useNavigation();
 
     useEffect(() => {
@@ -21,6 +26,13 @@ export default function GoalDetails() {
                     if (data?.warning) {
                         setWarning(true);
                     }
+
+                    if (data.imageUri) {
+                        const imageRef = ref(storage, data.imageUri);
+                        const downloadUrl = await getDownloadURL(imageRef);
+                        console.log(downloadUrl);
+                    }
+
                     setGoal(data);
                     //   navigation.setOptions({ headerTitle: data.text });
                 }
@@ -54,6 +66,7 @@ export default function GoalDetails() {
             />
             <Text style={warning && styles.warningText}>Details of {goal?.text}</Text>
             <GoalUsers goalId={id} />
+            {/* <Image source={{ uri: goal?.imageUri }} style={{ width: 200, height: 200 }} /> */}
         </View>
     );
 }
