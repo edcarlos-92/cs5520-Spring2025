@@ -2,6 +2,7 @@ export interface GoalData {
   text: string;
   warning?: boolean;
   owner: string | null;
+  imageUri?: string;
 }
 
 export interface User {
@@ -30,5 +31,10 @@ export interface GoalFromDB extends GoalData {
 
 export interface userInput {
   text: string;
-  uri: string;
+  imageUri: string;
+}
+
+export interface LocationData {
+  latitude: number;
+  longitude: number;
 }

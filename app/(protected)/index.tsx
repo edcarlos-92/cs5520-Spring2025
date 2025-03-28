@@ -15,39 +15,26 @@ import { useEffect, useState } from "react";
 import GoalItem from "@/components/GoalItem";
 import { writeToDB, deleteFromDB } from "@/Firebase/firestoreHelper";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { database, auth } from "@/Firebase/firebaseSetup";
+import { auth, database, storage } from "@/Firebase/firebaseSetup";
 import PressableButton from "@/components/PressableButton";
 import { GoalData, GoalFromDB, userInput } from "@/types";
-import ImageManager from "@/components/ImageManager";
+import { ref, uploadBytesResumable } from "firebase/storage";
+
 
 export default function App() {
   const appName = "My Awesome App";
   const [goals, setGoals] = useState<GoalFromDB[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-
-
   useEffect(() => {
-    // Only continue if user is authenticated
+    //start the listener on real time changes on goals collection
     if (!auth.currentUser) return;
-
-    // Query the database for goals that belong to the current user
-    const goalsQuery = query(
-      collection(database, "goals"),
-      where("owner", "==", auth.currentUser.uid)
-    );
-
     const unsubscribe = onSnapshot(
-
-      // collection(database,"goals"),
-
-      goalsQuery,
+      // repace the next line with a query that checks for owner field:
+      query(
+        collection(database, "goals"),
+        where("owner", "==", auth.currentUser?.uid)
+      ),
       (querySnapshot) => {
-
-        //replce
-
-
-
         //check if the querySnapshot is empty
         if (querySnapshot.empty) {
           setGoals([]);
@@ -63,24 +50,14 @@ export default function App() {
         }
       },
       (error) => {
-        // Error handling for permission issues or other errors
-        console.error("Error getting goals:", error);
-        // Optionally show an alert to the user
-        Alert.alert(
-          "Error",
-          "Could not load your goals. Please try again later."
-        );
+        console.log("Error in getting goals", error);
       }
     );
-
     //return a cleanup function to stop the listener
     return () => {
       unsubscribe();
     };
-  }, [auth.currentUser]); // Add auth.currentUser as dependency
-
-
-
+  }, []);
   function handleDeleteGoal(deletedId: string) {
     //which goal was deleted?
     //I need to update the goals array by removing the goal
@@ -95,33 +72,41 @@ export default function App() {
     //call the function from firestoreHelper
     deleteFromDB(deletedId, "goals");
   }
-  function handleInputData(data: userInput) {
-    // this function will receive data from Input
-    console.log("data received from Input ", data);
-    //store the data in the state variable
-    // setReceivedData(data);
-    //close the modal
-    // define a variable of type Goal object
-    // let newGoal: GoalData = { text: data };
 
 
-    let newGoal: GoalData = {
-      text: data.text,
-      owner: auth.currentUser?.uid ? auth.currentUser.uid : null,
-    };
-
-
-    // write to db by calling the functionf rom firestoreHelper
-    writeToDB(newGoal, "goals");
-    //update it with the data received from Input and a random number
-    // add the object to the goals array
-    // use updater function in setState whenever you are
-    // updating the state based on the previous state
-    // setGoals((currGoals) => {
-    //   return [...currGoals, newGoal];
-    // });
-    setIsModalVisible(false);
+  async function handleInputData(data: userInput) {
+    try {
+      let storedImageUri;
+      // this function will receive data from Input
+      if (data.imageUri != undefined) {
+        storedImageUri = await fetchImage(data.imageUri);
+      }
+      //store the data in the state variable
+      // setReceivedData(data);
+      //close the modal
+      // define a variable of type Goal object
+      let newGoal: GoalData = {
+        text: data.text,
+        owner: auth.currentUser ? auth.currentUser.uid : null,
+      };
+      if (storedImageUri) {
+        newGoal.imageUri = storedImageUri;
+      }
+      // write to db by calling the functionf rom firestoreHelper
+      writeToDB(newGoal, "goals");
+      //update it with the data received from Input and a random number
+      // add the object to the goals array
+      // use updater function in setState whenever you are
+      // updating the state based on the previous state
+      // setGoals((currGoals) => {
+      //   return [...currGoals, newGoal];
+      // });
+      setIsModalVisible(false);
+    } catch (err) {
+      console.log("handleInputData error", err);
+    }
   }
+
   function dismissModal() {
     setIsModalVisible(false);
   }
@@ -136,12 +121,31 @@ export default function App() {
       { text: "No", style: "cancel" },
     ]);
   }
+
+
+
+  async function fetchImage(uri: string) {
+    try {
+      // fetch the image data from the uri
+      const response = await fetch(uri);
+      if (!response.ok) {
+        //e.g. a 404 error
+        throw new Error("Image not found");
+      }
+      const blob = await response.blob();
+      const imageName = uri.substring(uri.lastIndexOf("/") + 1);
+      const imageRef = ref(storage, `images/${imageName}`);
+      const uploadResult = await uploadBytesResumable(imageRef, blob);
+      return uploadResult.metadata.fullPath;
+    } catch (err) {
+      console.log("fetch image error", err);
+    }
+  }
+
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
-
-
-
       <View style={styles.topContainer}>
         <Header name={appName} />
         <Input
@@ -191,9 +195,6 @@ export default function App() {
             );
           }}
         />
-
-
-
         {/* <ScrollView contentContainerStyle={styles.centeredHorizontal}>
           {goals.map((goalObj) => {
             return (
@@ -203,12 +204,7 @@ export default function App() {
             );
           })}
         </ScrollView> */}
-
-
-
       </View>
-
-
     </SafeAreaView>
   );
 }
