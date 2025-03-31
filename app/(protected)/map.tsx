@@ -1,13 +1,36 @@
 import { Button, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MapView, { Marker } from "react-native-maps";
 import { LocationData } from "@/types";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 export default function map() {
     const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(
         null
     );
+
+
+    const params = useLocalSearchParams();
+    // if (params) update the location state variable
+    console.log(`params in map: ${params}`);
+
+    useEffect(() => {
+        if (params.latitude && params.longitude) {
+            //check if params is not empty {}
+            setSelectedLocation({
+                latitude: parseFloat(
+                    Array.isArray(params.latitude) ? params.latitude[0] : params.latitude
+                ),
+                longitude: parseFloat(
+                    Array.isArray(params.longitude)
+                        ? params.longitude[0]
+                        : params.longitude
+                ),
+            });
+        }
+    }, []);
+
+
     function confirmLocationHandler() {
         // send the selectedLocation to the profile screen
         // router.navigate(
