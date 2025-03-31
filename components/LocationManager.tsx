@@ -14,6 +14,8 @@ import {
 } from "expo-location";
 import { LocationData } from "@/types";
 import { router, useLocalSearchParams } from "expo-router";
+import { readDocFromDB, writeToDB } from "@/Firebase/firestoreHelper";
+import { auth } from "@/Firebase/firebaseSetup";
 
 export default function LocationManager() {
     const params = useLocalSearchParams();
@@ -37,6 +39,32 @@ export default function LocationManager() {
             });
         }
     }, []);
+
+
+    useEffect(() => {
+        console.log("auth.currentUser", auth?.currentUser?.uid);
+        async function fetchUserData() {
+            if (auth?.currentUser?.uid) {
+
+                try {
+                    const data = await readDocFromDB(auth.currentUser.uid, "users");
+                    console.log("data", data);
+                    if (data) {
+                        setLocation({
+                            latitude: parseFloat(data.address.geo.lat),
+                            longitude: parseFloat(data.address.geo.lng),
+                        });
+                    }
+                } catch (e) {
+                    console.log("Error in fetching user data", e);
+
+                }
+
+            }
+        }
+        fetchUserData();
+    }, []);
+
     async function verifyPermission() {
         try {
             if (permissionResponse?.status === "granted") {
@@ -88,6 +116,21 @@ export default function LocationManager() {
                     style={styles.map}
                 />
             )}
+
+            <Button
+                disabled={!location}
+                title="Save location to firebases" onPress={() => writeToDB({
+                    address: {
+                        geo: {
+                            lat: location?.latitude.toString(),
+                            lng: location?.longitude.toString(),
+                        },
+                    },
+                }, "users", auth.currentUser?.uid)} />
+
+
+
+
         </View>
     );
 }
