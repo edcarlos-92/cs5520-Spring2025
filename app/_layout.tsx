@@ -8,6 +8,7 @@ export default function _layout() {
     const segments = useSegments();
     console.log("segments", segments);
     const [userLoggedIn, setUserLoggedIn] = useState(false);
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             console.log("user", user);
@@ -16,6 +17,7 @@ export default function _layout() {
             } else {
                 setUserLoggedIn(false);
             }
+            setLoading(false);
         });
         return () => {
             unsubscribe();
@@ -23,16 +25,19 @@ export default function _layout() {
     }, []);
 
     useEffect(() => {
-        if (userLoggedIn && segments[0] === "(auth)") {
-            console.log("user is logged in");
-            router.replace("(protected)");
-        } else if (!userLoggedIn && segments[0] === "(protected)") {
-            console.log("user is not logged in");
-            router.replace("(auth)/login");
+        if (!loading) {
+            if (userLoggedIn && segments[0] === "(auth)") {
+                console.log("user is logged in");
+                router.replace("(protected)");
+            } else if (!userLoggedIn && segments[0] === "(protected)") {
+                console.log("user is not logged in");
+                router.replace("(auth)/login");
+            }
         }
-    }, [userLoggedIn]);
+    }, [userLoggedIn, loading]);
 
-    return <Slot />;
+
+    return loading ? <Text>Loading...</Text> : <Slot />;
 }
 
 const styles = StyleSheet.create({});
