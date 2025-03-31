@@ -19,12 +19,25 @@ import { auth, database, storage } from "@/Firebase/firebaseSetup";
 import PressableButton from "@/components/PressableButton";
 import { GoalData, GoalFromDB, userInput } from "@/types";
 import { ref, uploadBytesResumable } from "firebase/storage";
+import { setNotificationHandler } from "expo-notifications";
 
+
+setNotificationHandler({
+  handleNotification: async () => {
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }
+  },
+});
 
 export default function App() {
   const appName = "My Awesome App";
   const [goals, setGoals] = useState<GoalFromDB[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+
   useEffect(() => {
     //start the listener on real time changes on goals collection
     if (!auth.currentUser) return;
