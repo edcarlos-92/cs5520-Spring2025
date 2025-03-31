@@ -7,7 +7,7 @@ import {
     Text,
     View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     getCurrentPositionAsync,
     useForegroundPermissions,
@@ -17,10 +17,26 @@ import { router, useLocalSearchParams } from "expo-router";
 
 export default function LocationManager() {
     const params = useLocalSearchParams();
-    // if (params) update the location state variable
-    console.log(params);
+
     const [permissionResponse, requestPermission] = useForegroundPermissions();
     const [location, setLocation] = useState<LocationData | null>(null);
+    // if (params) update the location state variable
+    console.log("params :", params);
+    useEffect(() => {
+        if (params.latitude && params.longitude) {
+            //check if params is not empty {}
+            setLocation({
+                latitude: parseFloat(
+                    Array.isArray(params.latitude) ? params.latitude[0] : params.latitude
+                ),
+                longitude: parseFloat(
+                    Array.isArray(params.longitude)
+                        ? params.longitude[0]
+                        : params.longitude
+                ),
+            });
+        }
+    }, []);
     async function verifyPermission() {
         try {
             if (permissionResponse?.status === "granted") {
