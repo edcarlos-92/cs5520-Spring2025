@@ -33,7 +33,7 @@ const NotificationsManager = () => {
                 content: {
                     title: "Daily goal Reminder",
                     body: "Don't forget to add your daily Goal",
-                    data: { data: "goes here" },
+                    data: { url: "http://google.com" },
                 },
                 trigger: {
                     seconds: 20,
@@ -47,6 +47,9 @@ const NotificationsManager = () => {
             console.log(`Error In scheduling notification`, err);
         }
     };
+
+
+
 
 
     return (
