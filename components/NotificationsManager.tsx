@@ -35,7 +35,11 @@ const NotificationsManager = () => {
                     body: "Don't forget to add your daily Goal",
                     data: { data: "goes here" },
                 },
-                trigger: { seconds: 5, type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL },
+                trigger: {
+                    seconds: 20,
+                    // repeats: false,
+                    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+                },
             });
         }
         catch (err) {
