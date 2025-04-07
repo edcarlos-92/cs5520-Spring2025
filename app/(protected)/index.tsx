@@ -8,10 +8,11 @@ import {
   ScrollView,
   FlatList,
   Alert,
+  Linking,
 } from "react-native";
 import Header from "@/components/Header";
 import Input from "@/components/Input";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import GoalItem from "@/components/GoalItem";
 import { writeToDB, deleteFromDB } from "@/Firebase/firestoreHelper";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
@@ -19,9 +20,15 @@ import { auth, database, storage } from "@/Firebase/firebaseSetup";
 import PressableButton from "@/components/PressableButton";
 import { GoalData, GoalFromDB, userInput } from "@/types";
 import { ref, uploadBytesResumable } from "firebase/storage";
-import { setNotificationHandler } from "expo-notifications";
+import { addNotificationReceivedListener, addNotificationResponseReceivedListener, getExpoPushTokenAsync, setNotificationHandler } from "expo-notifications";
+import { router } from "expo-router";
+import * as Notifications from 'expo-notifications';
+import Constants from "expo-constants";
 
 
+
+
+//set the notification handler
 setNotificationHandler({
   handleNotification: async () => {
     return {
@@ -37,6 +44,112 @@ export default function App() {
   const [goals, setGoals] = useState<GoalFromDB[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const [expoPushToken, setExpoPushToken] = useState('');
+
+
+  useEffect(() => {
+    const subscription = addNotificationReceivedListener((notification) => {
+      console.log("Notification received", notification);
+    }
+    );
+    return () => {
+      subscription.remove();
+    }
+  }, []);
+
+  useEffect(() => {
+    const subscription = addNotificationResponseReceivedListener((response) => {
+      console.log("Notification response received", response);
+      //extract data from response 
+      //use linking API from react-native to navigate to the url
+
+      const url = response.notification.request.content.data.url;
+      if (url) {
+        Linking.openURL(url);
+      }
+
+      // router.navigate("/");
+
+
+    }
+    );
+
+
+    return () => subscription.remove();
+  }, []);
+
+
+  // useEffect(() => {
+  //   const fetchToken = async () => {
+  //     try {
+  //       const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  //       let finalStatus = existingStatus;
+
+  //       if (existingStatus !== 'granted') {
+  //         const { status } = await Notifications.requestPermissionsAsync();
+  //         finalStatus = status;
+  //       }
+
+  //       if (finalStatus !== 'granted') {
+  //         Alert.alert('Permission not granted', 'Please enable push notifications in your settings.');
+  //         return;
+  //       }
+
+  //       const tokenInfo = await Notifications.getExpoPushTokenAsync();
+  //       console.log('Token Info:=====', tokenInfo);
+  //       setExpoPushToken(tokenInfo.data);
+  //     } catch (err) {
+  //       console.log('Error in fetching token:', err);
+  //       Alert.alert('Error', 'Failed to fetch push token');
+  //     }
+  //   };
+
+  //   fetchToken();
+  // }, []);
+
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        // Check if we have permission
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+
+        // Request permission if not granted
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+
+        if (finalStatus !== 'granted') {
+          Alert.alert('Permission not granted', 'Please enable push notifications in your settings.');
+          return;
+        }
+
+        // Get project ID from Constants
+        const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+
+        if (!projectId) {
+          console.log('Project ID not found');
+          Alert.alert('Configuration Issue', 'Missing project configuration for push notifications');
+          return;
+        }
+
+        // Get push token with project ID
+        const tokenInfo = await Notifications.getExpoPushTokenAsync({
+          projectId: projectId
+        });
+
+        console.log('Token Info:', tokenInfo);
+        setExpoPushToken(tokenInfo.data);
+      } catch (err) {
+        console.log('Error in fetching token:', err);
+        Alert.alert('Error', 'Failed to fetch push token: ' + (err instanceof Error ? err.message : String(err)));
+      }
+    };
+
+    fetchToken();
+  }, []);
 
   useEffect(() => {
     //start the listener on real time changes on goals collection
@@ -156,6 +269,24 @@ export default function App() {
   }
 
 
+  function testPushNotification() {
+
+    fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        to: expoPushToken,//ExponentPushToken[TFPJ9uAtD-LgEhl03OEAht]
+        title: "Test Notification",
+        body: "This is a test notification for my goals app",
+        data: { url: "http://google.com" },
+      }),
+    })
+  }
+
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
@@ -168,6 +299,9 @@ export default function App() {
           dismissModal={dismissModal}
         />
         <PressableButton pressedHandler={() => setIsModalVisible(true)}>
+
+          <Button title="Test Push Notification" onPress={() => testPushNotification()} />
+
           <Text style={styles.addGoalButton}>Add a Goal</Text>
         </PressableButton>
         {/* <Button title="Add a Goal" onPress={() => setIsModalVisible(true)} /> */}
@@ -253,3 +387,5 @@ const styles = StyleSheet.create({
     color: "white",
   },
 });
+
+
