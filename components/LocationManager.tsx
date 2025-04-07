@@ -38,7 +38,7 @@ export default function LocationManager() {
                 ),
             });
         }
-    }, []);
+    }, [params.latitude, params.longitude]);
 
 
     useEffect(() => {
